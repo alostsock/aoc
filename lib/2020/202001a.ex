@@ -7,27 +7,31 @@ defmodule AOC202001a do
   end
 
   defp nums do
-    AOC.input(__MODULE__) |> Stream.map(&String.to_integer/1)
+    AOC.input(__MODULE__) |> Enum.map(&String.to_integer/1)
   end
 
   defp find_pair do
-    stream =
-      for a <- nums(),
-          b <- nums(),
+    n = nums()
+
+    result =
+      for a <- n,
+          b <- n,
           a + b == 2020,
           do: a * b
 
-    stream |> Enum.at(0)
+    result |> Enum.at(0)
   end
 
   defp find_triplet do
-    stream =
-      for a <- nums(),
-          b <- nums(),
-          c <- nums(),
+    n = nums()
+
+    result =
+      for a <- n,
+          b <- n,
+          c <- n,
           a + b + c == 2020,
           do: a * b * c
 
-    stream |> Enum.at(0)
+    result |> Enum.at(0)
   end
 end

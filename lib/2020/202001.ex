@@ -7,41 +7,39 @@ defmodule AOC202001 do
   end
 
   def part1 do
-    find_pair() |> multiply()
+    solve(2)
   end
 
   def part2 do
-    find_triplet() |> multiply()
+    solve(3)
   end
 
-  defp multiply(nums) do
-    nums |> Enum.reduce(fn n, acc -> n * acc end)
+  defp solve(n) do
+    nums()
+    |> replicate_stream(n)
+    |> Stream.filter(&(Enum.sum(&1) == 2020))
+    |> Enum.at(0)
+    |> Enum.reduce(fn num, acc -> num * acc end)
   end
 
   defp nums do
-    AOC.input(__MODULE__) |> Stream.map(&String.to_integer/1)
+    AOC.input(__MODULE__) |> Enum.map(&String.to_integer/1)
   end
 
-  defp find_pair do
-    nums()
-    |> Stream.flat_map(fn a ->
-      nums()
-      |> Stream.filter(&(a + &1 == 2020))
-      |> Stream.map(&[a, &1])
-    end)
-    |> Enum.at(0)
+  def replicate_stream(stream, n) when n > 0 do
+    stream |> replicate_stream(stream, n, 1)
   end
 
-  defp find_triplet do
-    nums()
-    |> Stream.flat_map(fn a ->
-      nums()
-      |> Stream.flat_map(fn b ->
-        nums()
-        |> Stream.filter(&(a + b + &1 == 2020))
-        |> Stream.map(&[a, b, &1])
-      end)
+  defp replicate_stream(acc, stream, n, depth) when depth < n do
+    acc
+    |> Stream.flat_map(fn elements ->
+      stream
+      |> Stream.map(&[&1 | List.wrap(elements)])
     end)
-    |> Enum.at(0)
+    |> replicate_stream(stream, n, depth + 1)
+  end
+
+  defp replicate_stream(acc, _, _, _) do
+    acc
   end
 end
