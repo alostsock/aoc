@@ -40,10 +40,9 @@ defmodule AOC202002 do
   def validate2(%{"letter" => letter, "a" => a, "b" => b, "pw" => pw}) do
     letters = String.graphemes(pw)
 
-    pair =
-      [Enum.at(letters, a - 1), Enum.at(letters, b - 1)]
-      |> Enum.uniq()
+    first = Enum.at(letters, a - 1)
+    second = Enum.at(letters, b - 1)
 
-    length(pair) == 2 and Enum.member?(pair, letter)
+    (first == letter) != (second == letter)
   end
 end
