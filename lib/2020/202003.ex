@@ -20,7 +20,7 @@ defmodule AOC202003 do
     end)
   end
 
-  def traverse(matrix, slope, pos \\ {0, 0}, tree_count \\ 0)
+  def traverse(m, slope, pos \\ {0, 0}, count \\ 0)
 
   def traverse(m, slope, pos, count) do
     {width, height, matrix} = m
@@ -42,25 +42,19 @@ defmodule AOC202003 do
     |> matrix_from_list()
   end
 
-  def matrix_from_list(list) do
+  defp matrix_from_list(list) do
     height = length(list)
     width = length(Enum.at(list, 0))
 
     matrix =
-      Stream.zip(list, 0..(height - 1))
-      |> Stream.flat_map(fn {row, y} ->
-        Stream.zip(row, 0..(width - 1))
-        |> Stream.map(fn {square, x} ->
-          {{x, y}, square}
-        end)
-      end)
-      |> Enum.reduce(Map.new(), fn {pair, square}, acc ->
-        case square do
-          "." -> Map.put(acc, pair, 0)
-          "#" -> Map.put(acc, pair, 1)
-        end
-      end)
+      for {row, y} <- Enum.with_index(list),
+          {square, x} <- Enum.with_index(row),
+          into: %{},
+          do: {{x, y}, convert_square(square)}
 
     {width, height, matrix}
   end
+
+  defp convert_square("."), do: 0
+  defp convert_square("#"), do: 1
 end
