@@ -47,33 +47,33 @@ defmodule AOC202007 do
     end)
   end
 
-  defp traverse_inner(map, key, acc \\ MapSet.new())
+  defp traverse_inner(map, key, acc \\ MapSet.new()) do
+    if is_map_key(map, key) do
+      outer_bags = map[key]
 
-  defp traverse_inner(map, key, acc) when is_map_key(map, key) do
-    outer_bags = map[key]
-
-    Enum.reduce(outer_bags, acc, fn bag, acc ->
-      traverse_inner(map, bag, MapSet.put(acc, bag))
-    end)
+      Enum.reduce(outer_bags, acc, fn bag, acc ->
+        traverse_inner(map, bag, MapSet.put(acc, bag))
+      end)
+    else
+      acc
+    end
   end
-
-  defp traverse_inner(_, _, acc), do: acc
 
   defp create_outer_bag_map(bags), do: bags |> Enum.into(%{})
 
-  defp traverse_outer(map, key, acc \\ 0)
+  defp traverse_outer(map, key, acc \\ 0) do
+    if is_map_key(map, key) do
+      inner_bags = map[key]
 
-  defp traverse_outer(map, key, acc) when is_map_key(map, key) do
-    inner_bags = map[key]
+      inner_count =
+        Enum.reduce(inner_bags, 0, fn {num, bag}, acc ->
+          acc + num * traverse_outer(map, bag)
+        end)
 
-    count =
-      Enum.reduce(inner_bags, 0, fn {num, bag}, acc ->
-        acc + num * traverse_outer(map, bag)
-      end)
-
-    # Account for the outer bag
-    acc + count + 1
+      # Account for the outer bag
+      acc + inner_count + 1
+    else
+      1
+    end
   end
-
-  defp traverse_outer(_, _, _), do: 1
 end
