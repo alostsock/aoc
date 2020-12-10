@@ -14,6 +14,6 @@ defmodule AOC do
 
   def inspect_time(fun) do
     {time, result} = :timer.tc(fun)
-    IO.puts("#{result}\nDone in #{time / 1000} ms.")
+    IO.puts("#{inspect result}\nDone in #{time / 1000} ms.")
   end
 end
