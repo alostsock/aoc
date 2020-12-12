@@ -56,31 +56,35 @@ defmodule AOC202011 do
     end
   end
 
-  defp update_seat(pos, seatmap, strategy) do
+  defp update_seat(pos, seatmap, :part1) do
     {state, _} = seatmap[pos]
 
-    {count, n} =
-      case strategy do
-        :part1 -> {&count_adjacent/2, 4}
-        :part2 -> {&count_linear/2, 5}
-      end
+    cond do
+      state == :empty and count_adjacent(pos, seatmap) == 0 -> {:occupied, :fresh}
+      state == :occupied and count_adjacent(pos, seatmap) >= 4 -> {:empty, :fresh}
+      true -> {state, :stale}
+    end
+  end
+
+  defp update_seat(pos, seatmap, :part2) do
+    {state, _} = seatmap[pos]
 
     cond do
-      state == :empty and count.(pos, seatmap) == 0 -> {:occupied, :fresh}
-      state == :occupied and count.(pos, seatmap) >= n -> {:empty, :fresh}
+      state == :empty and count_linear(pos, seatmap) == 0 -> {:occupied, :fresh}
+      state == :occupied and count_linear(pos, seatmap) >= 5 -> {:empty, :fresh}
       true -> {state, :stale}
     end
   end
 
   defp count_adjacent(pos, seatmap) do
     adjacent_coords(pos)
-    |> Enum.map(&seatmap[&1])
+    |> Enum.map(fn coord -> seatmap[coord] end)
     |> count_occupied_seats()
   end
 
   defp count_linear(pos, seatmap) do
     directions()
-    |> Enum.map(&look(pos, seatmap, &1))
+    |> Enum.map(fn dir -> look(pos, seatmap, dir) end)
     |> count_occupied_seats()
   end
 
@@ -108,12 +112,12 @@ defmodule AOC202011 do
   end
 
   defp look({x, y}, seatmap, {u, v} = dir) do
-    next_pos = {x + u, y + v}
-    next_seat = seatmap[next_pos]
+    pos = {x + u, y + v}
+    seat = seatmap[pos]
 
-    case next_seat do
-      {:floor, _} -> look(next_pos, seatmap, dir)
-      _ -> next_seat
+    case seat do
+      {:floor, _} -> look(pos, seatmap, dir)
+      _ -> seat
     end
   end
 end
