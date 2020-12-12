@@ -6,16 +6,6 @@ defmodule AOC202012 do
     AOC.inspect_time(&part2/0)
   end
 
-  def part1 do
-    ship = instructions() |> Enum.reduce(ship(), &nav/2)
-    dist_manhattan(ship[:x], ship[:y])
-  end
-
-  def part2 do
-    ship = instructions() |> Enum.reduce(ship_with_waypoint(), &nav/2)
-    dist_manhattan(ship[:x], ship[:y])
-  end
-
   defp ship do
     %{x: 0, y: 0, angle: 0}
   end
@@ -25,6 +15,16 @@ defmodule AOC202012 do
   end
 
   defguardp has_waypoint(ship) when is_map_key(ship, :wp)
+
+  def part1 do
+    ship = instructions() |> Enum.reduce(ship(), &nav/2)
+    dist_manhattan(ship[:x], ship[:y])
+  end
+
+  def part2 do
+    ship = instructions() |> Enum.reduce(ship_with_waypoint(), &nav/2)
+    dist_manhattan(ship[:x], ship[:y])
+  end
 
   defp instructions do
     AOC.input(__MODULE__)
