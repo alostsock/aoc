@@ -1,24 +1,16 @@
 package main
 
 import (
-	"os"
+	"aoc/utils"
 	"strconv"
-	"strings"
 )
 
-func getInput(fname string) []int {
-	data, err := os.ReadFile(fname)
-	if err != nil {
-		panic(err)
-	}
-	s := string(data)
-	words := strings.Split(s, "\n")
+func getInput(name string) []int {
+	lines := utils.ReadLines(name, "\n")
 	nums := make([]int, 0)
-	for _, v := range words {
+	for _, v := range lines {
 		num, err := strconv.Atoi(v)
-		if err != nil {
-			continue
-		}
+		utils.Check(err)
 		nums = append(nums, num)
 	}
 	return nums
@@ -43,7 +35,6 @@ func p2(nums []int) int {
 		if i == 0 || i == len(nums)-1 {
 			continue
 		}
-
 		sum := nums[i-1] + nums[i] + nums[i+1]
 		if i > 1 && sum > prevSum {
 			increases += 1
