@@ -2,6 +2,7 @@ package utils
 
 import (
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -22,4 +23,18 @@ func ReadLines(name string, delim string) []string {
 		}
 	}
 	return notEmpty
+}
+
+func StrToInt(s string) int {
+	i, err := strconv.Atoi(s)
+	Check(err)
+	return i
+}
+
+func SumInt(nums ...int) int {
+	sum := 0
+	for _, n := range nums {
+		sum += n
+	}
+	return sum
 }
