@@ -27,11 +27,10 @@ func p2(fishes []int, days int) {
 	// shift counts for each growth stage group
 	for day := 0; day < days; day++ {
 		newFish := fishCounts[0]
-		for i := 0; i < 6; i++ {
+		for i := 0; i < 7; i++ {
 			fishCounts[i] = fishCounts[i+1]
 		}
-		fishCounts[6] = newFish + fishCounts[7]
-		fishCounts[7] = fishCounts[8]
+		fishCounts[6] += newFish
 		fishCounts[8] = newFish
 	}
 	fmt.Printf("part 2: %d\n", utils.SumInt(fishCounts...))
