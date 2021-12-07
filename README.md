@@ -1,3 +1,3 @@
 # Advent of Code (2021)
 
-Solutions in Go this time.
+Solutions in Go and Ruby this time.
