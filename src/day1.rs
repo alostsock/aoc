@@ -31,7 +31,7 @@ impl Solution for Day1 {
                 elves.push(0);
             }
         }
-        elves.sort();
+        elves.sort_unstable();
         elves.reverse();
         elves.iter().take(3).sum()
     }

@@ -1,3 +1,7 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::missing_panics_doc)]
+#![allow(clippy::must_use_candidate, clippy::must_use_unit)]
+
 mod day1;
 mod example;
 mod utils;
@@ -32,7 +36,7 @@ pub trait Solution {
     where
         Self: std::default::Default,
     {
-        Default::default()
+        Self::default()
     }
 
     fn run(&self, part: Option<u8>)
