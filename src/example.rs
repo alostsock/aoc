@@ -15,3 +15,13 @@ impl Solution for Example {
         (2022 * 25).to_string()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        assert_eq!(Example::new().part_1(), String::from("2022"));
+    }
+}
