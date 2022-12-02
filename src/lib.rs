@@ -3,6 +3,7 @@
 #![allow(clippy::must_use_candidate, clippy::must_use_unit)]
 
 mod day1;
+mod day2;
 mod example;
 mod utils;
 
@@ -12,6 +13,7 @@ pub fn run_solution(day: u8, part: Option<u8>) {
     match day {
         0 => example::Example::new().run(part),
         1 => day1::Day1::new().run(part),
+        2 => day2::Day2::new().run(part),
         _ => panic!("day {} hasn't been implemented yet", day),
     };
 }
