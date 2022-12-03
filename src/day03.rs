@@ -10,7 +10,7 @@ impl Solution for Day3 {
 
     fn part_1(&self) -> Self::P1 {
         include_str!("data/day03")
-            .split('\n')
+            .lines()
             .map(|line| {
                 let (a, b) = line.split_at(line.len() / 2);
                 let a: HashSet<char> = a.chars().collect();
@@ -25,8 +25,8 @@ impl Solution for Day3 {
         // `Iterator::array_chunks` would be perfect for this, but it's not in stable yet
         // https://github.com/rust-lang/rust/issues/100450
         include_str!("data/day03")
-            .split('\n')
-            .collect::<Vec<&str>>()
+            .lines()
+            .collect::<Vec<_>>()
             .chunks_exact(3)
             .map(|rucksacks| {
                 let a: HashSet<char> = rucksacks[0].chars().collect();
