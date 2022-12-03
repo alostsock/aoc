@@ -2,8 +2,9 @@
 #![allow(clippy::missing_panics_doc)]
 #![allow(clippy::must_use_candidate, clippy::must_use_unit)]
 
-mod day1;
-mod day2;
+mod day01;
+mod day02;
+mod day03;
 mod example;
 mod utils;
 
@@ -12,8 +13,9 @@ use std::time::Instant;
 pub fn run_solution(day: u8, part: Option<u8>) {
     match day {
         0 => example::Example::new().run(part),
-        1 => day1::Day1::new().run(part),
-        2 => day2::Day2::new().run(part),
+        1 => day01::Day1::new().run(part),
+        2 => day02::Day2::new().run(part),
+        3 => day03::Day3::new().run(part),
         _ => panic!("day {} hasn't been implemented yet", day),
     };
 }
