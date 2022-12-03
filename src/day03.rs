@@ -34,10 +34,7 @@ impl Solution for Day3 {
                 let a: HashSet<char> = rucksacks[0].chars().collect();
                 let b: HashSet<char> = rucksacks[1].chars().collect();
                 let ab: HashSet<&char> = a.intersection(&b).collect();
-                let unique_item = rucksacks[2]
-                    .chars()
-                    .find(|&item| ab.contains(&item))
-                    .unwrap();
+                let unique_item = rucksacks[2].chars().find(|item| ab.contains(item)).unwrap();
                 priority_from_item(unique_item)
             })
             .sum()
