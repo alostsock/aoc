@@ -23,10 +23,12 @@ impl Solution for Day3 {
     }
 
     fn part_2(&self) -> Self::P2 {
-        let lines: Vec<String> = read_lines("src/data/day03").unwrap().flatten().collect();
         // `Iterator::array_chunks` would be perfect for this, but it's not in stable yet
         // https://github.com/rust-lang/rust/issues/100450
-        lines
+        read_lines("src/data/day03")
+            .unwrap()
+            .flatten()
+            .collect::<Vec<String>>()
             .chunks_exact(3)
             .map(|rucksacks| {
                 let a: HashSet<char> = rucksacks[0].chars().collect();
