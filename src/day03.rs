@@ -1,4 +1,4 @@
-use crate::{utils::read_lines, Solution};
+use crate::Solution;
 use std::collections::HashSet;
 
 #[derive(Default)]
@@ -9,9 +9,8 @@ impl Solution for Day3 {
     type P2 = usize;
 
     fn part_1(&self) -> Self::P1 {
-        read_lines("src/data/day03")
-            .unwrap()
-            .flatten()
+        include_str!("data/day03")
+            .split('\n')
             .map(|line| {
                 let (a, b) = line.split_at(line.len() / 2);
                 let a: HashSet<char> = a.chars().collect();
@@ -25,10 +24,9 @@ impl Solution for Day3 {
     fn part_2(&self) -> Self::P2 {
         // `Iterator::array_chunks` would be perfect for this, but it's not in stable yet
         // https://github.com/rust-lang/rust/issues/100450
-        read_lines("src/data/day03")
-            .unwrap()
-            .flatten()
-            .collect::<Vec<String>>()
+        include_str!("data/day03")
+            .split('\n')
+            .collect::<Vec<&str>>()
             .chunks_exact(3)
             .map(|rucksacks| {
                 let a: HashSet<char> = rucksacks[0].chars().collect();

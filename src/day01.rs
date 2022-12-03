@@ -1,4 +1,4 @@
-use crate::{utils::read_lines, Solution};
+use crate::Solution;
 
 #[derive(Default)]
 pub struct Day1 {}
@@ -10,8 +10,8 @@ impl Solution for Day1 {
     fn part_1(&self) -> Self::P1 {
         let mut max_calories = 0;
         let mut current_calories = 0;
-        for line in read_lines("src/data/day01").unwrap() {
-            if let Ok(calories) = line.unwrap().parse::<usize>() {
+        for line in include_str!("data/day01").split('\n') {
+            if let Ok(calories) = line.parse::<usize>() {
                 current_calories += calories;
             } else {
                 max_calories = max_calories.max(current_calories);
@@ -23,8 +23,8 @@ impl Solution for Day1 {
 
     fn part_2(&self) -> Self::P2 {
         let mut elves: Vec<usize> = vec![0];
-        for line in read_lines("src/data/day01").unwrap() {
-            if let Ok(calories) = line.unwrap().parse::<usize>() {
+        for line in include_str!("data/day01").split('\n') {
+            if let Ok(calories) = line.parse::<usize>() {
                 *elves.last_mut().unwrap() += calories;
             } else {
                 elves.push(0);

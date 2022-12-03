@@ -1,4 +1,4 @@
-use crate::{utils::read_lines, Solution};
+use crate::Solution;
 
 #[derive(Default)]
 pub struct Day2 {}
@@ -9,7 +9,7 @@ impl Solution for Day2 {
 
     fn part_1(&self) -> Self::P1 {
         let mut total_score = 0;
-        for line in read_lines("src/data/day02").unwrap().flatten() {
+        for line in include_str!("data/day02").split('\n') {
             let (opponent, play) = line.split_at(1);
             total_score += score(opponent, play.trim_start());
         }
@@ -18,7 +18,7 @@ impl Solution for Day2 {
 
     fn part_2(&self) -> Self::P2 {
         let mut total_score = 0;
-        for line in read_lines("src/data/day02").unwrap().flatten() {
+        for line in include_str!("data/day02").split('\n') {
             let (opponent, end_state) = line.split_at(1);
             total_score += play(opponent, end_state.trim_start());
         }
