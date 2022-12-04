@@ -40,10 +40,22 @@ impl Solution for Day3 {
 }
 
 fn priority_from_item(item: char) -> usize {
-    let code = item as usize;
-    match code {
-        97..=122 => code - 96,
-        65..=90 => code - 38,
+    match item {
+        'a'..='z' => (item as usize) - ('a' as usize) + 1,
+        'A'..='Z' => (item as usize) - ('A' as usize) + 27,
         _ => 0,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn priority_works() {
+        assert_eq!(priority_from_item('a'), 1);
+        assert_eq!(priority_from_item('z'), 26);
+        assert_eq!(priority_from_item('A'), 27);
+        assert_eq!(priority_from_item('Z'), 52);
     }
 }
