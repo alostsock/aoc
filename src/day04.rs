@@ -10,30 +10,26 @@ impl Solution for Day4 {
     fn part_1(&self) -> Self::P1 {
         include_str!("data/day04")
             .lines()
-            .filter(|line| {
-                let (a, b) = line.split_once(',').unwrap();
-                let (a_start, a_end) = a.split_once('-').unwrap();
-                let (b_start, b_end) = b.split_once('-').unwrap();
-                is_overlapping(n(a_start), n(a_end), n(b_start), n(b_end))
-            })
+            .map(numbers)
+            .filter(|(a, b, c, d)| is_overlapping(*a, *b, *c, *d))
             .count()
     }
 
     fn part_2(&self) -> Self::P2 {
         include_str!("data/day04")
             .lines()
-            .filter(|line| {
-                let (a, b) = line.split_once(',').unwrap();
-                let (a_start, a_end) = a.split_once('-').unwrap();
-                let (b_start, b_end) = b.split_once('-').unwrap();
-                is_overlapping_partial(n(a_start), n(a_end), n(b_start), n(b_end))
-            })
+            .map(numbers)
+            .filter(|(a, b, c, d)| is_overlapping_partial(*a, *b, *c, *d))
             .count()
     }
 }
 
-fn n(s: &str) -> usize {
-    s.parse::<usize>().unwrap()
+fn numbers(line: &str) -> (usize, usize, usize, usize) {
+    let nums: Vec<_> = line
+        .split(&['-', ','])
+        .map(|s| s.parse::<usize>().unwrap())
+        .collect();
+    (nums[0], nums[1], nums[2], nums[3])
 }
 
 fn is_overlapping(a_start: usize, a_end: usize, b_start: usize, b_end: usize) -> bool {
