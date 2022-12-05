@@ -35,16 +35,16 @@ struct Move {
 
 impl Move {
     fn perform(&self, stacks: &mut Stacks, maintain_order: bool) {
-        let stack = stacks.get_mut(self.from).unwrap();
-
-        let i = stack.len().saturating_sub(self.amount);
-        let mut taken = stack.split_off(i);
+        let source = stacks.get_mut(self.from).unwrap();
+        let index = source.len().saturating_sub(self.amount);
+        let mut taken = source.split_off(index);
 
         if !maintain_order {
             taken.reverse();
         }
 
-        stacks.get_mut(self.to).unwrap().append(&mut taken);
+        let target = stacks.get_mut(self.to).unwrap();
+        target.append(&mut taken);
     }
 }
 
@@ -54,12 +54,9 @@ fn parse_stacks_and_moves(input: &str) -> (Stacks, Vec<Move>) {
     let mut stacks = Stacks::default();
 
     for line in stacks_raw.lines().rev().skip(1) {
-        let chars: Vec<_> = line.chars().collect();
-
-        for i in (1..line.len()).step_by(4) {
-            let char = chars[i];
-            if !char.is_whitespace() {
-                stacks[(i - 1) / 4].push(char);
+        for (stack_index, crate_id) in line.chars().skip(1).step_by(4).enumerate() {
+            if !crate_id.is_whitespace() {
+                stacks[stack_index].push(crate_id);
             }
         }
     }
