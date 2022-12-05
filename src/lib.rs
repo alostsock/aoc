@@ -6,6 +6,7 @@ mod day01;
 mod day02;
 mod day03;
 mod day04;
+mod day05;
 mod example;
 
 use std::time::Instant;
@@ -17,6 +18,7 @@ pub fn run_solution(day: u8, part: Option<u8>) {
         2 => day02::Day2::new().run(part),
         3 => day03::Day3::new().run(part),
         4 => day04::Day4::new().run(part),
+        5 => day05::Day5::new().run(part),
         _ => panic!("day {} hasn't been implemented yet", day),
     };
 }
