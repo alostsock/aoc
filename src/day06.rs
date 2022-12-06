@@ -1,5 +1,5 @@
 use crate::Solution;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 #[derive(Default)]
 pub struct Day6 {}
@@ -30,32 +30,30 @@ fn find(s: &str, length: usize) -> usize {
 #[derive(Default)]
 struct Lookup {
     unique_char_count: usize,
-    seen_char_count: HashMap<char, usize>,
+    char_counts: [usize; 26],
 }
 
 impl Lookup {
+    fn code(char: char) -> usize {
+        (char as usize) - ('a' as usize)
+    }
+
     fn add(&mut self, char: char) {
-        self.seen_char_count
-            .entry(char)
-            .and_modify(|count| {
-                *count += 1;
-                if *count == 1 {
-                    self.unique_char_count += 1;
-                }
-            })
-            .or_insert_with(|| {
-                self.unique_char_count += 1;
-                1
-            });
+        let i = Self::code(char);
+
+        self.char_counts[i] += 1;
+        if self.char_counts[i] == 1 {
+            self.unique_char_count += 1;
+        }
     }
 
     fn sub(&mut self, char: char) {
-        self.seen_char_count.entry(char).and_modify(|count| {
-            *count -= 1;
-            if *count == 0 {
-                self.unique_char_count -= 1;
-            }
-        });
+        let i = Self::code(char);
+
+        self.char_counts[i] -= 1;
+        if self.char_counts[i] == 0 {
+            self.unique_char_count -= 1;
+        }
     }
 }
 
