@@ -27,55 +27,58 @@ fn find(s: &str, length: usize) -> usize {
     index + length
 }
 
-fn find_fast(s: &str, length: usize) -> usize {
-    let mut unique_char_count = 0;
-    let mut seen = HashMap::<char, usize>::new();
+#[derive(Default)]
+struct Lookup {
+    unique_char_count: usize,
+    seen_char_count: HashMap<char, usize>,
+}
 
-    // initialize `seen`
-    for char in s.get(0..length - 1).unwrap().chars() {
-        seen.entry(char)
+impl Lookup {
+    fn add(&mut self, char: char) {
+        self.seen_char_count
+            .entry(char)
             .and_modify(|count| {
                 *count += 1;
                 if *count == 1 {
-                    unique_char_count += 1;
+                    self.unique_char_count += 1;
                 }
             })
             .or_insert_with(|| {
-                unique_char_count += 1;
+                self.unique_char_count += 1;
                 1
             });
     }
 
-    // iterate through the rest
-    let slice: Vec<_> = s.chars().collect();
-    for (i, window) in slice.windows(length).enumerate() {
-        // add last char
-        seen.entry(*window.last().unwrap())
-            .and_modify(|count| {
-                *count += 1;
-                if *count == 1 {
-                    unique_char_count += 1;
-                }
-            })
-            .or_insert_with(|| {
-                unique_char_count += 1;
-                1
-            });
-
-        if unique_char_count == length {
-            return i + length;
-        }
-
-        // remove first char
-        seen.entry(*window.first().unwrap()).and_modify(|count| {
+    fn sub(&mut self, char: char) {
+        self.seen_char_count.entry(char).and_modify(|count| {
             *count -= 1;
             if *count == 0 {
-                unique_char_count -= 1;
+                self.unique_char_count -= 1;
             }
         });
     }
+}
 
-    0
+fn find_fast(s: &str, length: usize) -> usize {
+    let mut lookup = Lookup::default();
+
+    // initialize `seen`
+    for char in s.get(0..length - 1).unwrap().chars() {
+        lookup.add(char);
+    }
+
+    let slice: Vec<_> = s.chars().collect();
+    for (i, window) in slice.windows(length).enumerate() {
+        lookup.add(*window.last().unwrap());
+
+        if lookup.unique_char_count == length {
+            return i + length;
+        }
+
+        lookup.sub(*window.first().unwrap());
+    }
+
+    panic!("didn't find a marker")
 }
 
 #[cfg(test)]
