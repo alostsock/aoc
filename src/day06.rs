@@ -19,13 +19,11 @@ impl Solution for Day6 {
 
 fn first_marker(s: &str, length: usize) -> usize {
     let slice: Vec<_> = s.chars().collect();
-    for (i, window) in slice.windows(length).enumerate() {
-        let set: HashSet<&char> = window.iter().collect();
-        if set.len() == length {
-            return i + length;
-        }
-    }
-    0
+    let index = slice
+        .windows(length)
+        .position(|window| window.iter().collect::<HashSet<_>>().len() == length)
+        .unwrap();
+    index + length
 }
 
 #[cfg(test)]
