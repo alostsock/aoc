@@ -105,21 +105,21 @@ impl Tree {
         index: usize,
         size_condition: &mut F,
     ) -> Vec<usize> {
-        let mut large_dirs = vec![];
+        let mut dirs = vec![];
 
         let node = self.node(index);
 
         if node.is_dir && size_condition(node.size) {
-            large_dirs.push(node.size);
+            dirs.push(node.size);
         }
 
-        large_dirs.extend(
+        dirs.extend(
             node.children
                 .iter()
                 .flat_map(|i| self.find_dirs(*i, size_condition)),
         );
 
-        large_dirs
+        dirs
     }
 }
 
