@@ -4,19 +4,18 @@ use crate::Solution;
 pub struct Day4 {}
 
 impl Solution for Day4 {
-    type P1 = usize;
-    type P2 = usize;
+    type Result = usize;
 
-    fn part_1(&self) -> Self::P1 {
-        include_str!("data/day04")
+    fn part_1(&self) -> Self::Result {
+        include_str!("data/day4")
             .lines()
             .map(numbers)
             .filter(|(a, b, c, d)| is_overlapping(*a, *b, *c, *d))
             .count()
     }
 
-    fn part_2(&self) -> Self::P2 {
-        include_str!("data/day04")
+    fn part_2(&self) -> Self::Result {
+        include_str!("data/day4")
             .lines()
             .map(numbers)
             .filter(|(a, b, c, d)| is_overlapping_partial(*a, *b, *c, *d))

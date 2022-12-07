@@ -4,21 +4,20 @@ use crate::Solution;
 pub struct Day2 {}
 
 impl Solution for Day2 {
-    type P1 = usize;
-    type P2 = usize;
+    type Result = usize;
 
-    fn part_1(&self) -> Self::P1 {
+    fn part_1(&self) -> Self::Result {
         let mut total_score = 0;
-        for line in include_str!("data/day02").lines() {
+        for line in include_str!("data/day2").lines() {
             let (theirs, mine) = line.split_once(' ').unwrap();
             total_score += score(theirs, mine);
         }
         total_score
     }
 
-    fn part_2(&self) -> Self::P2 {
+    fn part_2(&self) -> Self::Result {
         let mut total_score = 0;
-        for line in include_str!("data/day02").lines() {
+        for line in include_str!("data/day2").lines() {
             let (theirs, end_state) = line.split_once(' ').unwrap();
             total_score += playout(theirs, end_state);
         }

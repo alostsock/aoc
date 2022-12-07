@@ -5,15 +5,14 @@ use std::collections::HashSet;
 pub struct Day6 {}
 
 impl Solution for Day6 {
-    type P1 = usize;
-    type P2 = usize;
+    type Result = usize;
 
-    fn part_1(&self) -> Self::P1 {
-        find_fast(include_str!("data/day06"), 4)
+    fn part_1(&self) -> Self::Result {
+        find_fast(include_str!("data/day6"), 4)
     }
 
-    fn part_2(&self) -> Self::P2 {
-        find_fast(include_str!("data/day06"), 14)
+    fn part_2(&self) -> Self::Result {
+        find_fast(include_str!("data/day6"), 14)
     }
 }
 

@@ -4,13 +4,12 @@ use crate::Solution;
 pub struct Day1 {}
 
 impl Solution for Day1 {
-    type P1 = usize;
-    type P2 = usize;
+    type Result = usize;
 
-    fn part_1(&self) -> Self::P1 {
+    fn part_1(&self) -> Self::Result {
         let mut max_calories = 0;
         let mut current_calories = 0;
-        for line in include_str!("data/day01").lines() {
+        for line in include_str!("data/day1").lines() {
             if let Ok(calories) = line.parse::<usize>() {
                 current_calories += calories;
             } else {
@@ -21,9 +20,9 @@ impl Solution for Day1 {
         max_calories
     }
 
-    fn part_2(&self) -> Self::P2 {
+    fn part_2(&self) -> Self::Result {
         let mut elves: Vec<usize> = vec![0];
-        for line in include_str!("data/day01").lines() {
+        for line in include_str!("data/day1").lines() {
             if let Ok(calories) = line.parse::<usize>() {
                 *elves.last_mut().unwrap() += calories;
             } else {

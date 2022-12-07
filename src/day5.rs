@@ -4,19 +4,18 @@ use crate::Solution;
 pub struct Day5 {}
 
 impl Solution for Day5 {
-    type P1 = String;
-    type P2 = String;
+    type Result = String;
 
-    fn part_1(&self) -> Self::P1 {
-        let (mut stacks, moves) = parse_stacks_and_moves(include_str!("data/day05"));
+    fn part_1(&self) -> Self::Result {
+        let (mut stacks, moves) = parse_stacks_and_moves(include_str!("data/day5"));
         for mv in moves {
             mv.perform(&mut stacks, false);
         }
         topmost_crates(&stacks)
     }
 
-    fn part_2(&self) -> Self::P2 {
-        let (mut stacks, moves) = parse_stacks_and_moves(include_str!("data/day05"));
+    fn part_2(&self) -> Self::Result {
+        let (mut stacks, moves) = parse_stacks_and_moves(include_str!("data/day5"));
         for mv in moves {
             mv.perform(&mut stacks, true);
         }

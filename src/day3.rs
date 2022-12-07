@@ -5,11 +5,10 @@ use std::collections::HashSet;
 pub struct Day3 {}
 
 impl Solution for Day3 {
-    type P1 = usize;
-    type P2 = usize;
+    type Result = usize;
 
-    fn part_1(&self) -> Self::P1 {
-        include_str!("data/day03")
+    fn part_1(&self) -> Self::Result {
+        include_str!("data/day3")
             .lines()
             .map(|line| {
                 let (a, b) = line.split_at(line.len() / 2);
@@ -21,10 +20,10 @@ impl Solution for Day3 {
             .sum()
     }
 
-    fn part_2(&self) -> Self::P2 {
+    fn part_2(&self) -> Self::Result {
         // `Iterator::array_chunks` would be perfect for this, but it's not in stable yet
         // https://github.com/rust-lang/rust/issues/100450
-        include_str!("data/day03")
+        include_str!("data/day3")
             .lines()
             .collect::<Vec<_>>()
             .chunks_exact(3)

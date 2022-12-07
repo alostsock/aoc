@@ -6,7 +6,7 @@ use clap::Parser;
 struct Args {
     /// A specific day of the month (1 to 25)
     #[arg(long)]
-    day: u8,
+    day: Option<u8>,
 
     /// The part of a solution to run (1 or 2)
     #[arg(long)]
@@ -16,8 +16,10 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    if args.day > 25 {
-        panic!("argument 'day' should be between 1 and 25");
+    if let Some(day) = args.day {
+        if day > 25 {
+            panic!("argument 'day' should be between 1 and 25");
+        }
     }
 
     if let Some(part) = args.part {
@@ -26,12 +28,10 @@ fn main() {
         }
     }
 
-    let part_text = if args.part.is_some() {
-        format!(", part {}", args.part.unwrap())
+    if args.day.is_some() {
+        aoc::solve(args.day, args.part);
     } else {
-        "".to_string()
-    };
-    println!("\nRunning day {}{}...", args.day, part_text);
-
-    aoc::run_solution(args.day, args.part);
+        println!("\nRunning solutions for all days...");
+        aoc::solve(None, None);
+    }
 }
