@@ -44,7 +44,7 @@ struct Node {
 
 impl Node {
     fn new_dir(parent: Option<usize>) -> Self {
-        Node {
+        Self {
             parent,
             children: vec![],
             size: 0,
@@ -53,7 +53,7 @@ impl Node {
     }
 
     fn new_file(parent: Option<usize>, size: usize) -> Self {
-        Node {
+        Self {
             parent,
             children: vec![],
             size,
@@ -80,15 +80,15 @@ impl Tree {
 
     /// Add a new directory or file
     fn insert(&mut self, node: Node) -> usize {
-        let id = self.0.len();
+        let index = self.0.len();
         if let Some(parent) = node.parent {
-            self.node_mut(parent).children.push(id);
+            self.node_mut(parent).children.push(index);
         }
         if !node.is_dir {
             self.update_parent_sizes(node.parent, node.size);
         }
         self.0.push(node);
-        id
+        index
     }
 
     fn update_parent_sizes(&mut self, first_parent: Option<usize>, size: usize) {
@@ -130,7 +130,7 @@ fn parse_into_tree(s: &str) -> Tree {
     let mut cwd: Option<usize> = None;
 
     for line in s.lines() {
-        let parts: Vec<&str> = line.split(' ').collect();
+        let parts: Vec<_> = line.split(' ').collect();
 
         match &*parts {
             ["$", "cd", ".."] => {
@@ -140,7 +140,7 @@ fn parse_into_tree(s: &str) -> Tree {
                 let new_dir = tree.insert(Node::new_dir(cwd));
                 cwd = Some(new_dir);
             }
-            [size, _name] if size.chars().next().unwrap().is_numeric() => {
+            [size, _name] if size.chars().next().unwrap().is_ascii_digit() => {
                 tree.insert(Node::new_file(cwd, size.parse().unwrap()));
             }
             _ => continue,

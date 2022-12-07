@@ -31,7 +31,6 @@ fn main() {
     if args.day.is_some() {
         aoc::solve(args.day, args.part);
     } else {
-        println!("\nRunning solutions for all days...");
         aoc::solve(None, None);
     }
 }

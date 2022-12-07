@@ -10,22 +10,19 @@ seq!(N in 1..=7 {
     #(mod day~N;)*
 
     pub fn solve(day: Option<u8>, part: Option<u8>) {
-        if let Some(day) = day {
-            println!("\nRunning solution for day {}...", day);
-            match day {
-                0 => example::Example::new().run(part),
-                #(N => day~N::Day~N::new().run(part),)*
-                _ => (),
-            };
+        let days = if let Some(day) = day {
+            vec![day]
         } else {
-            for day in [#(N,)*] {
+            vec![#(N,)*]
+        };
+
+        for day in days {
             println!("\nRunning solution for day {}...", day);
             match day {
                 0 => example::Example::new().run(part),
                 #(N => day~N::Day~N::new().run(part),)*
                 _ => (),
             };
-        }
         }
     }
 });
