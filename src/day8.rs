@@ -38,16 +38,14 @@ fn visible_from_outside(grid: &Grid) -> usize {
         for col in 0..cols {
             let height = grid[row][col];
 
-            if (
-                // up
-                (0..row).all(|r| grid[r][col] < height)
-                // down
+            // for the current tree, look up, down, left, right, respectively
+            // to check if there exists a direction where every tree is shorter
+
+            if ((0..row).all(|r| grid[r][col] < height)
                 || (row + 1..rows).all(|r| grid[r][col] < height)
-                // left
                 || (0..col).all(|c| grid[row][c] < height)
-                // right
-                || (col + 1..cols).all(|c| grid[row][c] < height)
-            ) {
+                || (col + 1..cols).all(|c| grid[row][c] < height))
+            {
                 count += 1;
             }
         }
@@ -66,8 +64,9 @@ fn highest_scenic_score(grid: &Grid) -> usize {
         for col in 0..cols {
             let current_height = grid[row][col];
 
+            // used in `take_while` to include the boundary element
+            // https://github.com/rust-lang/rust/issues/62208
             let done = Cell::new(false);
-
             let check = |height: u32| -> bool {
                 if done.get() {
                     return false;
@@ -77,6 +76,9 @@ fn highest_scenic_score(grid: &Grid) -> usize {
                 }
                 true
             };
+
+            // for the current tree, look in each direction and take trees with
+            // shorter or equal height (inclusive)
 
             let up = (0..row).rev().take_while(|r| check(grid[*r][col])).count();
 
