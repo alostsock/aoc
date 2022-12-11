@@ -27,13 +27,13 @@ impl Solution for Day11 {
     }
 }
 
-type BoxedFn = Box<dyn Fn(usize) -> usize>;
+type F = Box<dyn Fn(usize) -> usize>;
 
 struct Monkey {
     items: Vec<usize>,
     items_inspected: usize,
-    op: BoxedFn,
-    test: BoxedFn,
+    op: F,
+    test: F,
     divisor: usize,
 }
 
@@ -70,16 +70,16 @@ impl Monkey {
             .next()
             .unwrap();
 
-        let op = match op_parts.as_slice() {
-            ["old", "*", "old"] => Box::new(|old: usize| old * old) as BoxedFn,
+        let op: F = match op_parts.as_slice() {
+            ["old", "*", "old"] => Box::new(|old: usize| old * old),
             ["old", "*", x] => {
                 let x = x.parse::<usize>().unwrap();
-                Box::new(move |old| old * x) as BoxedFn
+                Box::new(move |old| old * x)
             }
-            ["old", "+", "old"] => Box::new(|old| old + old) as BoxedFn,
+            ["old", "+", "old"] => Box::new(|old| old + old),
             ["old", "+", x] => {
                 let x = x.parse::<usize>().unwrap();
-                Box::new(move |old| old + x) as BoxedFn
+                Box::new(move |old| old + x)
             }
             _ => panic!("invalid operation"),
         };
@@ -107,15 +107,17 @@ fn parse_monkeys(s: &str) -> Vec<Monkey> {
 fn do_monkey_business(monkeys: &mut Vec<Monkey>, rounds: usize, is_very_worried: bool) {
     let common_divisor: usize = monkeys.iter().map(|m| m.divisor).product();
 
-    for _round in 0..rounds {
+    for _ in 0..rounds {
         for i in 0..monkeys.len() {
             for item in monkeys[i].items.clone() {
                 let mut worry_level = (*monkeys[i].op)(item);
+
                 if is_very_worried {
                     worry_level %= common_divisor;
                 } else {
                     worry_level /= 3;
                 }
+
                 let target_monkey = (*monkeys[i].test)(worry_level);
 
                 monkeys[i].items_inspected += 1;
@@ -138,7 +140,7 @@ mod tests {
     }
 
     #[test]
-    fn do_monkey_business_works() {
+    fn not_very_worried() {
         let mut monkeys = parse_monkeys(TEST_INPUT);
         do_monkey_business(&mut monkeys, 20, false);
         let items_inspected: Vec<_> = monkeys.iter().map(|m| m.items_inspected).collect();
@@ -146,15 +148,20 @@ mod tests {
     }
 
     #[test]
-    fn do_monkey_business_very_worried_works() {
+    fn very_worried() {
         let mut monkeys = parse_monkeys(TEST_INPUT);
         do_monkey_business(&mut monkeys, 10_000, true);
         let items_inspected: Vec<_> = monkeys.iter().map(|m| m.items_inspected).collect();
         assert_eq!(items_inspected, vec![52_166, 47_830, 1_938, 52_013]);
     }
 
-    // #[test]
-    // fn it_works() {
-    //     assert_eq!(Day11::new().part_1(), 2022);
-    // }
+    #[test]
+    fn part_1_works() {
+        assert_eq!(Day11::new().part_1(), 57_838);
+    }
+
+    #[test]
+    fn part_2_works() {
+        assert_eq!(Day11::new().part_2(), 15_050_382_231);
+    }
 }
