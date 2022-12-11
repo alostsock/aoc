@@ -32,7 +32,7 @@ type F = Box<dyn Fn(usize) -> usize>;
 struct Monkey {
     items: Vec<usize>,
     items_inspected: usize,
-    op: F,
+    operation: F,
     test: F,
     divisor: usize,
 }
@@ -41,36 +41,26 @@ impl Monkey {
     fn from_str(s: &str) -> Self {
         let lines: Vec<&str> = s
             .lines()
-            .map(|line| line.split_once(':').unwrap().1)
+            .filter_map(|line| line.split(':').last())
             .collect();
-        let items = lines[1]
-            .trim()
-            .split(", ")
-            .map(|item_str| item_str.parse::<usize>().unwrap())
-            .collect();
-        let op_parts: Vec<&str> = lines[2]
-            .split_once(" = ")
+
+        let items: Vec<usize> = lines[1].trim().split(", ").flat_map(str::parse).collect();
+
+        let operation_parts: Vec<&str> = lines[2]
+            .split(" = ")
+            .last()
             .unwrap()
-            .1
             .split_whitespace()
             .collect();
-        let divisor = lines[3]
-            .split_whitespace()
-            .flat_map(str::parse::<usize>)
-            .next()
-            .unwrap();
-        let true_target = lines[4]
-            .split_whitespace()
-            .flat_map(str::parse::<usize>)
-            .next()
-            .unwrap();
-        let false_target = lines[5]
-            .split_whitespace()
-            .flat_map(str::parse::<usize>)
-            .next()
+
+        let [divisor, true_target, false_target]: [usize; 3] = lines[3..]
+            .iter()
+            .map(|line| line.split(' ').find_map(|s| s.parse().ok()).unwrap())
+            .collect::<Vec<usize>>()
+            .try_into()
             .unwrap();
 
-        let op: F = match op_parts.as_slice() {
+        let operation: F = match operation_parts.as_slice() {
             ["old", "*", "old"] => Box::new(|old: usize| old * old),
             ["old", "*", x] => {
                 let x = x.parse::<usize>().unwrap();
@@ -84,17 +74,19 @@ impl Monkey {
             _ => panic!("invalid operation"),
         };
 
+        let test = Box::new(move |worry_level: usize| {
+            if worry_level % divisor == 0 {
+                true_target
+            } else {
+                false_target
+            }
+        });
+
         Monkey {
             items,
             items_inspected: 0,
-            op,
-            test: Box::new(move |worry_level: usize| {
-                if worry_level % divisor == 0 {
-                    true_target
-                } else {
-                    false_target
-                }
-            }),
+            operation,
+            test,
             divisor,
         }
     }
@@ -109,8 +101,8 @@ fn do_monkey_business(monkeys: &mut Vec<Monkey>, rounds: usize, is_very_worried:
 
     for _ in 0..rounds {
         for i in 0..monkeys.len() {
-            for item in monkeys[i].items.clone() {
-                let mut worry_level = (*monkeys[i].op)(item);
+            while let Some(item) = monkeys[i].items.pop() {
+                let mut worry_level = (*monkeys[i].operation)(item);
 
                 if is_very_worried {
                     worry_level %= common_divisor;
@@ -123,7 +115,6 @@ fn do_monkey_business(monkeys: &mut Vec<Monkey>, rounds: usize, is_very_worried:
                 monkeys[i].items_inspected += 1;
                 monkeys[target_monkey].items.push(worry_level);
             }
-            monkeys[i].items.clear();
         }
     }
 }
