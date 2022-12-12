@@ -5,6 +5,15 @@
 use seq_macro::seq;
 use std::time::Instant;
 
+macro_rules! time {
+    ($e: expr) => {{
+        let start = Instant::now();
+        let result = $e;
+        let duration = start.elapsed();
+        (result, duration)
+    }};
+}
+
 seq!(N in 1..=12 {
     mod example;
     #(mod day~N;)*
@@ -16,25 +25,20 @@ seq!(N in 1..=12 {
             vec![#(N,)*]
         };
 
-        for day in days {
-            println!("\nRunning solution for day {}...", day);
-            match day {
-                0 => example::Example::new().run(part),
-                #(N => day~N::Day~N::new().run(part),)*
-                _ => (),
-            };
-        }
+        let (_, duration) = time!(
+            for day in days {
+                println!("\nRunning solution for day {}...", day);
+                match day {
+                    0 => example::Example::new().run(part),
+                    #(N => day~N::Day~N::new().run(part),)*
+                    _ => (),
+                };
+            }
+        );
+
+        println!("\n{:?} elapsed.", duration);
     }
 });
-
-macro_rules! time {
-    ($e: expr) => {{
-        let start = Instant::now();
-        let result = $e;
-        let duration = start.elapsed();
-        (result, duration)
-    }};
-}
 
 pub trait Solution {
     type Result;

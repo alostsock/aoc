@@ -1,4 +1,3 @@
-#![allow(const_item_mutation)]
 use crate::Solution;
 use std::collections::VecDeque;
 
