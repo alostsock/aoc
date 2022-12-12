@@ -10,12 +10,13 @@ impl Solution for Day12 {
 
     fn part_1(&self) -> Self::Result {
         let (grid, start, end) = parse_grid(include_str!("data/day12"));
-        find_path(&grid, start, end).unwrap()
+        find_path(&grid, vec![start], end).unwrap()
     }
 
     fn part_2(&self) -> Self::Result {
         let (grid, _, end) = parse_grid(include_str!("data/day12"));
-        find_good_starting_point(&grid, end)
+        let starting_points = find_starting_points(&grid);
+        find_path(&grid, starting_points, end).unwrap()
     }
 }
 
@@ -52,14 +53,16 @@ fn parse_grid(input: &str) -> (Grid, P, P) {
     (grid, start, end)
 }
 
-fn find_path(grid: &Grid, start: P, end: P) -> Option<usize> {
+fn find_path(grid: &Grid, starting_points: Vec<P>, end: P) -> Option<usize> {
     let (rows, cols) = (grid.len(), grid[0].len());
 
     let mut visited: Vec<Vec<bool>> = vec![vec![false; cols]; rows];
-    visited[start.0][start.1] = true;
-
     let mut to_visit: VecDeque<(P, usize)> = VecDeque::new();
-    to_visit.push_back((start, 0));
+
+    for start in starting_points {
+        visited[start.0][start.1] = true;
+        to_visit.push_back((start, 0));
+    }
 
     while let Some((current, step)) = to_visit.pop_front() {
         if current == end {
@@ -96,7 +99,7 @@ fn find_path(grid: &Grid, start: P, end: P) -> Option<usize> {
     None
 }
 
-fn find_good_starting_point(grid: &Grid, end: P) -> usize {
+fn find_starting_points(grid: &Grid) -> Vec<P> {
     let start_height = 'a' as usize;
     let mut starting_points: Vec<P> = vec![];
 
@@ -108,13 +111,7 @@ fn find_good_starting_point(grid: &Grid, end: P) -> usize {
         }
     }
 
-    let mut path_steps: Vec<usize> = starting_points
-        .iter()
-        .filter_map(|start| find_path(grid, *start, end))
-        .collect();
-
-    path_steps.sort_unstable();
-    *path_steps.first().unwrap()
+    starting_points
 }
 
 #[cfg(test)]
@@ -132,14 +129,15 @@ abdefghi
     #[test]
     fn find_path_works() {
         let (grid, start, end) = parse_grid(TEST_INPUT);
-        let least_steps = find_path(&grid, start, end).unwrap();
+        let least_steps = find_path(&grid, vec![start], end).unwrap();
         assert_eq!(least_steps, 31);
     }
 
     #[test]
     fn find_good_starting_point_works() {
         let (grid, _, end) = parse_grid(TEST_INPUT);
-        let least_steps = find_good_starting_point(&grid, end);
+        let starting_points = find_starting_points(&grid);
+        let least_steps = find_path(&grid, starting_points, end).unwrap();
         assert_eq!(least_steps, 29);
     }
 
