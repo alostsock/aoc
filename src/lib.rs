@@ -5,7 +5,7 @@
 use seq_macro::seq;
 use std::time::Instant;
 
-seq!(N in 1..=11 {
+seq!(N in 1..=12 {
     mod example;
     #(mod day~N;)*
 
