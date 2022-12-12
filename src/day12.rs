@@ -1,6 +1,6 @@
 #![allow(const_item_mutation)]
 use crate::Solution;
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::VecDeque;
 
 #[derive(Default)]
 pub struct Day12 {}
@@ -53,12 +53,13 @@ fn parse_grid(input: &str) -> (Grid, P, P) {
 }
 
 fn find_path(grid: &Grid, start: P, end: P) -> Option<usize> {
-    let mut visited: HashSet<P> = HashSet::new();
-    visited.insert(start);
+    let (rows, cols) = (grid.len(), grid[0].len());
+
+    let mut visited: Vec<Vec<bool>> = vec![vec![false; cols]; rows];
+    visited[start.0][start.1] = true;
+
     let mut to_visit: VecDeque<(P, usize)> = VecDeque::new();
     to_visit.push_back((start, 0));
-
-    let (r, c) = (grid.len() - 1, grid[0].len() - 1);
 
     while let Some((current, step)) = to_visit.pop_front() {
         if current == end {
@@ -68,24 +69,25 @@ fn find_path(grid: &Grid, start: P, end: P) -> Option<usize> {
         let (row, col) = current;
         let height = grid[row][col];
 
-        // up
+        let (r, c) = (rows - 1, cols - 1);
+
         for next in [
-            if row > 0 { Some((row - 1, col)) } else { None },
-            if row < r { Some((row + 1, col)) } else { None },
-            if col > 0 { Some((row, col - 1)) } else { None },
-            if col < c { Some((row, col + 1)) } else { None },
+            if row > 0 { Some((row - 1, col)) } else { None }, // up
+            if row < r { Some((row + 1, col)) } else { None }, // down
+            if col > 0 { Some((row, col - 1)) } else { None }, // left
+            if col < c { Some((row, col + 1)) } else { None }, // right
         ]
         .iter()
         .flatten()
         {
-            if visited.contains(next) {
+            if visited[next.0][next.1] {
                 continue;
             }
 
             let next_height = grid[next.0][next.1];
 
             if next_height < height || next_height - height <= 1 {
-                visited.insert(*next);
+                visited[next.0][next.1] = true;
                 to_visit.push_back((*next, step + 1));
             }
         }
