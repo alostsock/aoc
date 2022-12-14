@@ -53,7 +53,7 @@ impl Value {
         if s.starts_with('[') {
             // assume `s` is a valid list.
             // "[1,2,[3]]" -> "1,2,[3]"
-            let mut inner = s.get(1..s.len() - 1).unwrap();
+            let mut inner = &s[1..s.len() - 1];
 
             let mut list: Vec<Self> = vec![];
 
