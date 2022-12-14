@@ -68,7 +68,7 @@ impl Value {
                     inner = rest.strip_prefix(',').unwrap_or("");
                 } else {
                     // the next value is a `Value::Int`
-                    let (value_str, rest) = inner.split_once([',']).unwrap_or((inner, ""));
+                    let (value_str, rest) = inner.split_once(',').unwrap_or((inner, ""));
                     list.push(Value::from_str(value_str));
                     inner = rest;
                 }
