@@ -51,53 +51,54 @@ enum Value {
 impl Value {
     fn from_str(s: &str) -> Self {
         if s.starts_with('[') {
-            // assume `s` is a valid list
-            let mut list: Vec<Value> = vec![];
-
-            // comma-separated `Value`s
-            // e.g. "1,2,[3],[]"
+            // assume `s` is a valid list.
+            // "[1,2,[3]]" -> "1,2,[3]"
             let mut inner = s.get(1..s.len() - 1).unwrap();
+
+            let mut list: Vec<Self> = vec![];
 
             // chomp each comma-separated inner value one at a time
             while !inner.is_empty() {
                 if inner.starts_with('[') {
                     // the next value is a nested `Value::List`
-                    let end_index = value_end_position(inner);
+                    let end_index = Self::value_end_position(inner);
                     let (value_str, rest) = inner.split_at(end_index + 1);
-                    list.push(Value::from_str(value_str));
+
+                    list.push(Self::from_str(value_str));
                     inner = rest.strip_prefix(',').unwrap_or("");
                 } else {
                     // the next value is a `Value::Int`
                     let (value_str, rest) = inner.split_once(',').unwrap_or((inner, ""));
-                    list.push(Value::from_str(value_str));
+
+                    list.push(Self::from_str(value_str));
                     inner = rest;
                 }
             }
 
-            Value::List(list)
+            Self::List(list)
         } else {
-            Value::Int(s.parse().unwrap())
-        }
-    }
-}
-
-/// Assuming `s` starts with [, finds the index of the corresponding ]
-fn value_end_position(s: &str) -> usize {
-    let mut nest_level = 0;
-
-    for (i, char) in s.chars().enumerate() {
-        match char {
-            '[' => nest_level += 1,
-            ']' => nest_level -= 1,
-            _ => continue,
-        }
-
-        if nest_level == 0 {
-            return i;
+            Self::Int(s.parse().unwrap())
         }
     }
 
-    panic!("couldn't find matching ']'")
+    /// Assuming `s` starts with [, finds the index of the corresponding ]
+    fn value_end_position(s: &str) -> usize {
+        let mut nest_level = 0;
+
+        for (i, char) in s.chars().enumerate() {
+            match char {
+                '[' => nest_level += 1,
+                ']' => nest_level -= 1,
+                _ => continue,
+            }
+
+            if nest_level == 0 {
+                return i;
+            }
+        }
+
+        panic!("couldn't find matching ']'")
+    }
 }
 
 impl Ord for Value {
