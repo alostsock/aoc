@@ -1,4 +1,5 @@
 #![allow(clippy::cast_possible_wrap)]
+#![allow(clippy::cast_sign_loss)]
 
 use crate::Solution;
 use std::collections::HashSet;
@@ -43,21 +44,21 @@ fn d_manhattan(a: XY, b: XY) -> u32 {
 
 fn coverage_for_row(sensors_beacons: Vec<(XY, XY, u32)>, row: i32) -> usize {
     let (mut min_x, mut max_x) = (i32::MAX, 0);
-
-    let mut beacons_in_row: HashSet<i32> = HashSet::new();
+    let mut beacon_positions_in_row: HashSet<i32> = HashSet::new();
 
     for (s, b, d) in &sensors_beacons {
         let span_min_x = s.0 - (*d as i32);
         let span_max_x = s.0 + (*d as i32);
-        min_x = min_x.min(span_min_x).min(b.0);
-        max_x = max_x.max(span_max_x).max(b.0);
+        min_x = min_x.min(span_min_x);
+        max_x = max_x.max(span_max_x);
 
         if b.1 == row {
-            beacons_in_row.insert(b.0);
+            beacon_positions_in_row.insert(b.0);
         }
     }
 
-    let mut seen: HashSet<i32> = HashSet::new();
+    let seen_len = (max_x - min_x + 1) as usize;
+    let mut seen: Vec<bool> = vec![false; seen_len];
 
     for (s, _, d) in sensors_beacons {
         let (x, y) = s;
@@ -70,13 +71,13 @@ fn coverage_for_row(sensors_beacons: Vec<(XY, XY, u32)>, row: i32) -> usize {
         };
 
         for x_row in (x - x_span)..=(x + x_span) {
-            if x_row >= min_x && x_row <= max_x {
-                seen.insert(x_row);
+            if !beacon_positions_in_row.contains(&x_row) && x_row >= min_x && x_row <= max_x {
+                seen[(x_row - min_x) as usize] = true;
             }
         }
     }
 
-    seen.difference(&beacons_in_row).count()
+    seen.iter().filter(|s| **s).count()
 }
 
 #[cfg(test)]
