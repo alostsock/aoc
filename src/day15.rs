@@ -43,41 +43,47 @@ fn d_manhattan(a: XY, b: XY) -> u32 {
 }
 
 fn coverage_for_row(sensors_beacons: Vec<(XY, XY, u32)>, row: i32) -> usize {
-    let (mut min_x, mut max_x) = (i32::MAX, 0);
-    let mut beacon_positions_in_row: HashSet<i32> = HashSet::new();
+    let mut beacons: HashSet<i32> = HashSet::new();
+    let mut spans: Vec<(i32, i32)> = vec![];
 
-    for (s, b, d) in &sensors_beacons {
-        let span_min_x = s.0 - (*d as i32);
-        let span_max_x = s.0 + (*d as i32);
-        min_x = min_x.min(span_min_x);
-        max_x = max_x.max(span_max_x);
-
+    for (s, b, d) in sensors_beacons {
+        // record the beacon position
         if b.1 == row {
-            beacon_positions_in_row.insert(b.0);
+            beacons.insert(b.0);
         }
-    }
-
-    let seen_len = (max_x - min_x + 1) as usize;
-    let mut seen: Vec<bool> = vec![false; seen_len];
-
-    for (s, _, d) in sensors_beacons {
-        let (x, y) = s;
-
-        // check if the sensor is in range
-        let x_span: i32 = if row.abs_diff(y) <= d {
-            (d - row.abs_diff(y)) as i32
-        } else {
+        // check if the row is in range of the sensor
+        if row.abs_diff(s.1) > d {
             continue;
-        };
+        }
+        let x_span: i32 = (d - row.abs_diff(s.1)) as i32;
+        spans.push((s.0 - x_span, s.0 + x_span));
+    }
 
-        for x_row in (x - x_span)..=(x + x_span) {
-            if !beacon_positions_in_row.contains(&x_row) && x_row >= min_x && x_row <= max_x {
-                seen[(x_row - min_x) as usize] = true;
-            }
+    spans.sort_by(|a, b| a.0.cmp(&b.0));
+
+    // merge spans
+    let mut merged_spans: Vec<(i32, i32)> = vec![*spans.first().unwrap()];
+    for (from, to) in spans.iter().skip(1) {
+        let (_, prev_to) = merged_spans.last_mut().unwrap();
+
+        if to < prev_to {
+            continue;
+        }
+
+        if from <= prev_to {
+            *prev_to = *to;
+        } else {
+            merged_spans.push((*from, *to));
         }
     }
 
-    seen.iter().filter(|s| **s).count()
+    // find coverage
+    let mut coverage: usize = 0;
+    for (from, to) in merged_spans {
+        let beacons_in_span = beacons.iter().filter(|b| **b >= from && **b <= to).count();
+        coverage += (to - from) as usize + 1 - beacons_in_span;
+    }
+    coverage
 }
 
 #[cfg(test)]
