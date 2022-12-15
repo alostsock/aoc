@@ -14,7 +14,7 @@ macro_rules! time {
     }};
 }
 
-seq!(N in 1..=14 {
+seq!(N in 1..=15 {
     mod example;
     #(mod day~N;)*
 
