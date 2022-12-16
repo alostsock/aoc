@@ -105,30 +105,33 @@ fn coverage_gap_in_row(sensors_beacons: &Vec<(XY, XY, u32)>, row: i32, bound: i3
 
     spans.sort_by(|a, b| a.0.cmp(&b.0));
 
-    // merge spans
-    let mut merged_spans: Vec<(i32, i32)> = vec![*spans.first().unwrap()];
-    for (from, to) in spans.iter().skip(1) {
-        let (_, prev_to) = merged_spans.last_mut().unwrap();
+    // start checking for a gap
 
-        if to < prev_to {
+    let first = spans.first().unwrap();
+
+    if first.0 != 0 {
+        return Some(0);
+    }
+
+    // this should be continuous unless there is a gap
+    let mut latest_to = first.1;
+    for (from, to) in spans.iter().skip(1) {
+        if to < &latest_to {
             continue;
         }
 
-        if from <= prev_to {
-            *prev_to = *to;
+        if from <= &latest_to {
+            latest_to = *to;
         } else {
-            merged_spans.push((*from, *to));
+            return Some(latest_to + 1);
         }
     }
 
-    // check for a gap
-    match &*merged_spans {
-        [(_, b), (_, _)] => Some(b + 1),
-        [(0, to)] if to == &bound => None,
-        [(_, to)] if to == &bound => Some(0),
-        [(0, _)] => Some(bound),
-        _ => panic!("invalid span: {:?}", merged_spans),
+    if latest_to != bound {
+        return Some(bound);
     }
+
+    None
 }
 
 fn find_coverage_gap(sensors_beacons: &Vec<(XY, XY, u32)>, bound: i32) -> XY {
