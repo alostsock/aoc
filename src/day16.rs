@@ -2,7 +2,7 @@
 
 use crate::Solution;
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Day16 {}
@@ -109,23 +109,25 @@ impl Graph {
     // for a given start_index, use bfs to find the shortest distance each other node
     fn find_distances(&self, start_index: usize) -> Vec<usize> {
         let node_count = self.nodes.len();
-        let mut seen: HashSet<usize> = HashSet::new();
         let mut distances: Vec<usize> = vec![0; node_count];
-        let mut to_visit: Vec<usize> = vec![];
 
-        seen.insert(start_index);
-        to_visit.extend(self.node(start_index).children.iter());
+        let mut seen: Vec<bool> = vec![false; node_count];
+        seen[start_index] = true;
+        let mut seen_count = 1;
+
+        let mut to_visit: Vec<usize> = self.node(start_index).children.clone();
 
         let mut distance_traveled = 0;
 
-        while seen.len() < node_count {
+        while seen_count < node_count {
             distance_traveled += 1;
 
             to_visit = to_visit
                 .iter()
                 .filter_map(|index| {
-                    if !seen.contains(index) {
-                        seen.insert(*index);
+                    if !seen[*index] {
+                        seen[*index] = true;
+                        seen_count += 1;
                         distances[*index] = distance_traveled;
                     }
 
