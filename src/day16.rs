@@ -11,12 +11,13 @@ impl Solution for Day16 {
     type Result = usize;
 
     fn part_1(&self) -> Self::Result {
-        let mut graph = Graph::from_str(include_str!("data/day16"));
-        graph.find_max_pressure(graph.start_position, 1, 0, 0, &[])
+        let graph = Graph::from_str(include_str!("data/day16"));
+        let valves_opened = vec![false; graph.nodes.len()];
+        graph.find_max_pressure(graph.start_position, 30, 0, 0, &valves_opened)
     }
 
     fn part_2(&self) -> Self::Result {
-        2022 * 25
+        todo!()
     }
 }
 
@@ -146,38 +147,30 @@ impl Graph {
 
     // use dfs to go through all possible valve-opening combinations
     fn find_max_pressure(
-        &mut self,
+        &self,
         position: usize,
-        time: usize,
+        time_remaining: usize,
         global_flow_rate: usize,
         pressure_released: usize,
-        valves_opened: &[usize],
+        valves_opened: &[bool],
     ) -> usize {
         let pressure_released = pressure_released + global_flow_rate;
 
-        assert!(time <= 30);
-
-        if time == 30 {
-            return pressure_released;
-        }
-
-        let distances = self.distance_lookup[position].clone();
-
-        let candidate_max = distances
+        let candidate_max = self.distance_lookup[position]
             .iter()
             .enumerate()
             .filter_map(|(valve_index, distance)| {
                 let flow_rate = self.node(valve_index).flow_rate;
 
-                if valves_opened.contains(&valve_index) || flow_rate == 0 || time + distance >= 30 {
+                if valves_opened[valve_index] || flow_rate == 0 || distance + 1 >= time_remaining {
                     None
                 } else {
                     let mut valves_opened = valves_opened.to_owned();
-                    valves_opened.push(valve_index);
+                    valves_opened[valve_index] = true;
 
                     Some(self.find_max_pressure(
                         valve_index,
-                        time + distance + 1,
+                        time_remaining - (distance + 1),
                         global_flow_rate + flow_rate,
                         pressure_released + global_flow_rate * distance,
                         &valves_opened,
@@ -186,10 +179,10 @@ impl Graph {
             })
             .max();
 
-        if let Some(best_candidate) = candidate_max {
-            best_candidate
+        if let Some(max_pressure) = candidate_max {
+            max_pressure
         } else {
-            pressure_released + global_flow_rate * (30 - time)
+            pressure_released + global_flow_rate * (time_remaining - 1)
         }
     }
 }
@@ -218,13 +211,14 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
     #[test]
     fn release_pressure_works() {
-        let mut graph = Graph::from_str(TEST_INPUT);
-        let pressure = graph.find_max_pressure(graph.start_position, 1, 0, 0, &[]);
+        let graph = Graph::from_str(TEST_INPUT);
+        let valves_opened = vec![false; graph.nodes.len()];
+        let pressure = graph.find_max_pressure(graph.start_position, 30, 0, 0, &valves_opened);
         assert_eq!(pressure, 1651);
     }
 
-    #[test]
-    fn part_1_works() {
-        assert_eq!(Day16::new().part_1(), 1896);
-    }
+    // #[test]
+    // fn part_1_works() {
+    //     assert_eq!(Day16::new().part_1(), 1896);
+    // }
 }
