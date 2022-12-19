@@ -1,4 +1,5 @@
 #![allow(clippy::cast_precision_loss)]
+#![allow(clippy::cast_possible_truncation)]
 
 use crate::Solution;
 use regex::Regex;
@@ -12,12 +13,19 @@ impl Solution for Day16 {
 
     fn part_1(&self) -> Self::Result {
         let graph = Graph::from_str(include_str!("data/day16"));
-        let valves_opened = vec![false; graph.nodes.len()];
-        graph.find_max_pressure(graph.start_position, 30, 0, 0, &valves_opened)
+        let end_state = graph.find_max_pressure(State {
+            position: graph.start_position,
+            time_remaining: 30,
+            global_flow_rate: 0,
+            pressure_released: 0,
+            disabled_valves: vec![false; graph.nodes.len()],
+        });
+        end_state.pressure_released
     }
 
     fn part_2(&self) -> Self::Result {
-        todo!()
+        let graph = Graph::from_str(include_str!("data/day16"));
+        graph.find_max_pressure_with_elephant()
     }
 }
 
@@ -35,6 +43,43 @@ impl Node {
             name: String::from(name),
             flow_rate,
             children: vec![],
+        }
+    }
+}
+
+#[derive(Debug)]
+struct State {
+    position: usize,
+    time_remaining: usize,
+    global_flow_rate: usize,
+    pressure_released: usize,
+    disabled_valves: Vec<bool>,
+}
+
+impl State {
+    fn open_valve(&self, index: usize, flow_rate: usize, distance: usize) -> Self {
+        let mut disabled_valves = self.disabled_valves.clone();
+        disabled_valves[index] = true;
+
+        Self {
+            position: index,
+            time_remaining: self.time_remaining - (distance + 1),
+            global_flow_rate: self.global_flow_rate + flow_rate,
+            pressure_released: self.pressure_released + self.global_flow_rate * distance,
+            disabled_valves,
+        }
+    }
+
+    fn wait_out_timer(&self) -> Self {
+        let final_pressure =
+            self.pressure_released + self.global_flow_rate * (self.time_remaining - 1);
+
+        Self {
+            position: self.position,
+            time_remaining: 1,
+            global_flow_rate: self.global_flow_rate,
+            pressure_released: final_pressure,
+            disabled_valves: self.disabled_valves.clone(),
         }
     }
 }
@@ -146,44 +191,102 @@ impl Graph {
     }
 
     // use dfs to go through all possible valve-opening combinations
-    fn find_max_pressure(
-        &self,
-        position: usize,
-        time_remaining: usize,
-        global_flow_rate: usize,
-        pressure_released: usize,
-        valves_opened: &[bool],
-    ) -> usize {
-        let pressure_released = pressure_released + global_flow_rate;
+    fn find_max_pressure(&self, mut state: State) -> State {
+        state.pressure_released += state.global_flow_rate;
 
-        let candidate_max = self.distance_lookup[position]
+        let candidate_max = self.distance_lookup[state.position]
             .iter()
             .enumerate()
             .filter_map(|(valve_index, distance)| {
                 let flow_rate = self.node(valve_index).flow_rate;
 
-                if valves_opened[valve_index] || flow_rate == 0 || distance + 1 >= time_remaining {
-                    None
-                } else {
-                    let mut valves_opened = valves_opened.to_owned();
-                    valves_opened[valve_index] = true;
-
-                    Some(self.find_max_pressure(
-                        valve_index,
-                        time_remaining - (distance + 1),
-                        global_flow_rate + flow_rate,
-                        pressure_released + global_flow_rate * distance,
-                        &valves_opened,
-                    ))
+                if state.disabled_valves[valve_index]
+                    || flow_rate == 0
+                    || distance + 1 >= state.time_remaining
+                {
+                    return None;
                 }
-            })
-            .max();
 
-        if let Some(max_pressure) = candidate_max {
-            max_pressure
+                let next_state = state.open_valve(valve_index, flow_rate, *distance);
+                Some(self.find_max_pressure(next_state))
+            })
+            .max_by_key(|state| state.pressure_released);
+
+        if let Some(end_state) = candidate_max {
+            end_state
         } else {
-            pressure_released + global_flow_rate * (time_remaining - 1)
+            state.wait_out_timer()
         }
+    }
+
+    fn disabled_valves_from_bitmask(&self, mask: u16, openable_valves: &[usize]) -> Vec<bool> {
+        let mut disabled_valves = vec![false; self.nodes.len()];
+
+        for (i, valve_index) in openable_valves.iter().enumerate() {
+            let is_disabled = (mask >> i & 1) == 1;
+            disabled_valves[*valve_index] = is_disabled;
+        }
+
+        disabled_valves
+    }
+
+    fn inverse_bitmask(mask: u16, length: usize) -> u16 {
+        let unused_bits = 16 - length;
+        (!mask << unused_bits) >> unused_bits
+    }
+
+    // we need to run part 1 for both the person and elephant, with different
+    // combinations of valves disabled at the start.
+    fn find_max_pressure_with_elephant(&self) -> usize {
+        let openable_valves: Vec<usize> = self
+            .nodes
+            .iter()
+            .enumerate()
+            .filter_map(|(i, node)| if node.flow_rate > 0 { Some(i) } else { None })
+            .collect();
+
+        let mut max_pressure = 0;
+
+        // run through all possible disabled valve states. in the input, there's
+        // only 15 openable valves, so a u16 should be enough
+
+        let valve_count = openable_valves.len();
+        let total_states = 2_u16.pow(valve_count as u32);
+
+        let mut cached_bitmask_results: HashMap<u16, usize> = HashMap::new();
+
+        for bitmask in 0..total_states {
+            let inverse_bitmask = Self::inverse_bitmask(bitmask, valve_count);
+
+            let combined_pressure = [bitmask, inverse_bitmask]
+                .map(|mask| {
+                    if let Some(cached_pressure) = cached_bitmask_results.get(&mask) {
+                        *cached_pressure
+                    } else {
+                        let disabled_valves =
+                            self.disabled_valves_from_bitmask(mask, &openable_valves);
+
+                        let pressure = self
+                            .find_max_pressure(State {
+                                position: self.start_position,
+                                time_remaining: 26,
+                                global_flow_rate: 0,
+                                pressure_released: 0,
+                                disabled_valves,
+                            })
+                            .pressure_released;
+
+                        cached_bitmask_results.insert(mask, pressure);
+                        pressure
+                    }
+                })
+                .iter()
+                .sum();
+
+            max_pressure = max_pressure.max(combined_pressure);
+        }
+
+        max_pressure
     }
 }
 
@@ -210,15 +313,32 @@ Valve JJ has flow rate=21; tunnel leads to valve II
     // }
 
     #[test]
-    fn release_pressure_works() {
+    fn find_max_pressure_works() {
         let graph = Graph::from_str(TEST_INPUT);
-        let valves_opened = vec![false; graph.nodes.len()];
-        let pressure = graph.find_max_pressure(graph.start_position, 30, 0, 0, &valves_opened);
-        assert_eq!(pressure, 1651);
+        let end_state = graph.find_max_pressure(State {
+            position: graph.start_position,
+            time_remaining: 30,
+            global_flow_rate: 0,
+            pressure_released: 0,
+            disabled_valves: vec![false; graph.nodes.len()],
+        });
+        assert_eq!(end_state.pressure_released, 1651);
+    }
+
+    #[test]
+    fn find_max_pressure_with_elephant_works() {
+        let graph = Graph::from_str(TEST_INPUT);
+        let max_pressure = graph.find_max_pressure_with_elephant();
+        assert_eq!(max_pressure, 1707);
     }
 
     // #[test]
     // fn part_1_works() {
     //     assert_eq!(Day16::new().part_1(), 1896);
+    // }
+
+    // #[test]
+    // fn part_2_works() {
+    //     assert_eq!(Day16::new().part_2(), 2576);
     // }
 }
