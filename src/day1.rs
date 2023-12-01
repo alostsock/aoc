@@ -13,30 +13,39 @@ impl Solution for Day1 {
 
     fn part_2(&self) -> Self::Result {
         let input = include_str!("data/day1");
-        calibration_values_lettered(input)
+        calibration_value_lettered(input)
     }
 }
 
 fn calibration_value(input: &str) -> usize {
     let mut sum = 0;
     for line in input.lines() {
-        let first_digit = line.chars().find(|c| c.is_numeric()).unwrap();
-        let last_digit = line.chars().rev().find(|c| c.is_numeric()).unwrap();
-        let line_value: usize = format!("{first_digit}{last_digit}").parse().unwrap();
+        let first_digit = line.chars().find_map(|c| c.to_digit(10)).unwrap();
+        let last_digit = line.chars().rev().find_map(|c| c.to_digit(10)).unwrap();
+        let line_value = (first_digit * 10 + last_digit) as usize;
         sum += line_value;
     }
     sum
 }
 
-const LETTERED_DIGITS: [&str; 9] = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+const LETTERED_DIGITS: [(usize, &str); 9] = [
+    (1, "one"),
+    (2, "two"),
+    (3, "three"),
+    (4, "four"),
+    (5, "five"),
+    (6, "six"),
+    (7, "seven"),
+    (8, "eight"),
+    (9, "nine"),
+];
 
-fn calibration_values_lettered(input: &str) -> usize {
+fn calibration_value_lettered(input: &str) -> usize {
     let mut sum = 0;
     for line in input.lines() {
         let mut first_digit_position = line.len();
         let mut first_digit = 0;
-        for (index, lettered_digit) in LETTERED_DIGITS.iter().enumerate() {
-            let digit = index + 1;
+        for (digit, lettered_digit) in LETTERED_DIGITS {
             if let Some(position) = line.find(lettered_digit) {
                 if position < first_digit_position {
                     first_digit_position = position;
@@ -53,8 +62,7 @@ fn calibration_values_lettered(input: &str) -> usize {
 
         let mut last_digit_position = 0;
         let mut last_digit = first_digit;
-        for (index, lettered_digit) in LETTERED_DIGITS.iter().enumerate() {
-            let digit = index + 1;
+        for (digit, lettered_digit) in LETTERED_DIGITS {
             if let Some(position) = line.rfind(lettered_digit) {
                 if position > last_digit_position {
                     last_digit_position = position;
@@ -70,7 +78,7 @@ fn calibration_values_lettered(input: &str) -> usize {
             }
         }
 
-        let line_value: usize = format!("{first_digit}{last_digit}").parse().unwrap();
+        let line_value = first_digit * 10 + last_digit;
         sum += line_value;
     }
     sum
@@ -100,6 +108,6 @@ xtwone3four
 zoneight234
 7pqrstsixteen";
 
-        assert_eq!(calibration_values_lettered(input), 281);
+        assert_eq!(calibration_value_lettered(input), 281);
     }
 }
