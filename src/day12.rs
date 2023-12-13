@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::Solution;
 
 #[derive(Default)]
@@ -64,10 +66,15 @@ impl ConditionRecord {
 
     fn count_arrangements(
         &self,
+        cache: &mut HashMap<(usize, usize, usize), usize>,
         condition_index: usize,
         group_index: usize,
         damaged_count: usize,
     ) -> usize {
+        if let Some(&count) = cache.get(&(condition_index, group_index, damaged_count)) {
+            return count;
+        }
+
         let group_count = *self.groups.get(group_index).unwrap_or(&0);
 
         let damaged_conditions_needed = (group_index..self.groups.len())
@@ -85,17 +92,17 @@ impl ConditionRecord {
 
         let current_condition = self.pattern[condition_index];
 
-        let handle_damaged = || {
-            if group_index >= self.groups.len()
+        let handle_damaged = |cache| {
+            if group_index == self.groups.len()
                 || (damaged_count > 0 && damaged_count > group_count)
             {
                 return 0;
             }
 
-            self.count_arrangements(condition_index + 1, group_index, damaged_count + 1)
+            self.count_arrangements(cache, condition_index + 1, group_index, damaged_count + 1)
         };
 
-        let handle_operational = || {
+        let handle_operational = |cache| {
             if damaged_count > 0 && damaged_count != group_count {
                 return 0;
             }
@@ -106,24 +113,29 @@ impl ConditionRecord {
                 group_index
             };
 
-            self.count_arrangements(condition_index + 1, group_index, 0)
+            self.count_arrangements(cache, condition_index + 1, group_index, 0)
         };
 
-        match current_condition {
-            Condition::Damaged => handle_damaged(),
-            Condition::Operational => handle_operational(),
-            Condition::Unknown => handle_damaged() + handle_operational(),
-        }
+        let count = match current_condition {
+            Condition::Damaged => handle_damaged(cache),
+            Condition::Operational => handle_operational(cache),
+            Condition::Unknown => handle_damaged(cache) + handle_operational(cache),
+        };
+
+        cache
+            .entry((condition_index, group_index, damaged_count))
+            .or_insert(count);
+
+        count
     }
 }
 
 fn count_arrangements(input: &str, copies: usize) -> usize {
     input
         .lines()
-        .enumerate()
-        .map(|(index, line)| {
-            dbg!(index);
-            ConditionRecord::from_str(line, copies).count_arrangements(0, 0, 0)
+        .map(|line| {
+            let cache = &mut HashMap::default();
+            ConditionRecord::from_str(line, copies).count_arrangements(cache, 0, 0, 0)
         })
         .sum()
 }
@@ -148,5 +160,6 @@ mod tests {
     #[test]
     fn part_2() {
         assert_eq!(count_arrangements(INPUT, 5), 525152);
+        assert_eq!(Day12::new().part_2(), 7030194981795);
     }
 }
