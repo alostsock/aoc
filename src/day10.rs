@@ -255,7 +255,6 @@ SJ.L7
 |F--J
 LJ...";
         assert_eq!(Tiles::from_str(input).find_furthest_distance_in_loop(), 8);
-        // assert_eq!(Day10::new().part_1(), 7145);
     }
 
     #[test]
@@ -278,6 +277,5 @@ L7JLJL-JLJLJL--JLJ.L";
             .unwrap();
 
         assert_eq!(tiles.count_tiles_in_loop(loop_path), 10);
-        // assert_eq!(Day10::new().part_2(), 445);
     }
 }

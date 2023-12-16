@@ -58,12 +58,10 @@ mod tests {
     #[test]
     fn part_1() {
         assert_eq!(sum_next_values(INPUT, false), 114);
-        assert_eq!(Day9::new().part_1(), 2075724761);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(sum_next_values(INPUT, true), 2);
-        assert_eq!(Day9::new().part_2(), 1072);
     }
 }

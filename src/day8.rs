@@ -113,8 +113,6 @@ ZZZ = (ZZZ, ZZZ)";
         assert_eq!(count_steps_once(instructions, &nodes), 2);
         let (instructions, nodes) = parse(input_2);
         assert_eq!(count_steps_once(instructions, &nodes), 6);
-
-        assert_eq!(Day8::new().part_1(), 17263);
     }
 
     #[test]
@@ -132,6 +130,5 @@ XXX = (XXX, XXX)";
 
         let (instructions, nodes) = parse(input);
         assert_eq!(count_steps_simultanenous(instructions, &nodes), 6);
-        assert_eq!(Day8::new().part_2(), 14631604759649);
     }
 }

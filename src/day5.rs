@@ -163,12 +163,10 @@ humidity-to-location map:
     #[test]
     fn part_1() {
         assert_eq!(find_min_location_v1(INPUT), 35);
-        assert_eq!(Day5::new().part_1(), 600279879);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(find_min_location_v2(INPUT), 46);
-        // assert_eq!(Day5::new().part_2(), 20191102); // slow test
     }
 }

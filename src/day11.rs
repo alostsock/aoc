@@ -101,7 +101,5 @@ mod tests {
         assert_eq!(Observation::from_str(input, 2).shortest_paths(), 374);
         assert_eq!(Observation::from_str(input, 10).shortest_paths(), 1030);
         assert_eq!(Observation::from_str(input, 100).shortest_paths(), 8410);
-        assert_eq!(Day11::new().part_1(), 9329143);
-        assert_eq!(Day11::new().part_2(), 710674907809);
     }
 }

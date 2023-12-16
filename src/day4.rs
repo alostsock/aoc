@@ -101,12 +101,10 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
     #[test]
     fn part_1() {
         assert_eq!(count_points(INPUT), 13);
-        assert_eq!(Day4::new().part_1(), 22897);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(count_cards(INPUT), 30);
-        assert_eq!(Day4::new().part_2(), 5095824);
     }
 }

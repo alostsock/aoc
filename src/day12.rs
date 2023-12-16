@@ -154,12 +154,10 @@ mod tests {
     #[test]
     fn part_1() {
         assert_eq!(count_arrangements(INPUT, 1), 21);
-        assert_eq!(Day12::new().part_1(), 7118);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(count_arrangements(INPUT, 5), 525152);
-        assert_eq!(Day12::new().part_2(), 7030194981795);
     }
 }

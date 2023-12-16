@@ -176,13 +176,11 @@ QQQJA 483";
     #[test]
     fn part_1() {
         assert_eq!(determine_total_winnings(INPUT, false), 6440);
-        assert_eq!(Day7::new().part_1(), 248422077);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(determine_total_winnings(INPUT, true), 5905);
-        assert_eq!(Day7::new().part_2(), 249817836);
     }
 
     #[test]

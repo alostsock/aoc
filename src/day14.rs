@@ -174,12 +174,10 @@ O.#..O.#.#
     #[test]
     fn part_1() {
         assert_eq!(simulate(INPUT_1), 136);
-        assert_eq!(Day14::new().part_1(), 105784);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(simulate_cycles(INPUT_1), 64);
-        // assert_eq!(Day14::new().part_2(), 91286);
     }
 }

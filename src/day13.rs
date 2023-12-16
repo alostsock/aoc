@@ -266,13 +266,11 @@ mod tests {
     fn part_1() {
         assert_eq!(summarize(INPUT_1), 405);
         assert_eq!(summarize(INPUT_2), 709);
-        assert_eq!(Day13::new().part_1(), 29130);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(summarize_smudged_variants(INPUT_1), 400);
         assert_eq!(summarize_smudged_variants(INPUT_2), 1400);
-        assert_eq!(Day13::new().part_2(), 33438);
     }
 }

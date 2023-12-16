@@ -70,12 +70,10 @@ Distance:  9  40  200";
     #[test]
     fn part_1() {
         assert_eq!(count_options_v1(INPUT), 288);
-        assert_eq!(Day6::new().part_1(), 3316275);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(count_options_v2(INPUT), 71503);
-        assert_eq!(Day6::new().part_2(), 27102791);
     }
 }

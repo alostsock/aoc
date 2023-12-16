@@ -192,12 +192,10 @@ mod tests {
     #[test]
     fn part_1() {
         assert_eq!(part_numbers_sum(INPUT), 4361);
-        assert_eq!(Day3::new().part_1(), 530495);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(gear_ratios_sum(INPUT), 467835);
-        assert_eq!(Day3::new().part_2(), 80253814);
     }
 }

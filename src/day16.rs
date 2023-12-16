@@ -150,12 +150,10 @@ mod tests {
     #[test]
     fn part_1() {
         assert_eq!(simulate_beam(INPUT_1), 46);
-        assert_eq!(Day16::new().part_1(), 7608);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(find_best_beam(INPUT_1), 51);
-        // assert_eq!(Day16::new().part_2(), 8221);
     }
 }

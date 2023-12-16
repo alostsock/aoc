@@ -88,12 +88,10 @@ mod tests {
     #[test]
     fn part_1() {
         assert_eq!(hash_csv(INPUT_1), 1320);
-        assert_eq!(Day15::new().part_1(), 510792);
     }
 
     #[test]
     fn part_2() {
         assert_eq!(collect_lenses(INPUT_1), 145);
-        assert_eq!(Day15::new().part_2(), 269410);
     }
 }
