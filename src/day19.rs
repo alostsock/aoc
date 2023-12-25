@@ -14,7 +14,8 @@ impl Solution for Day19 {
     }
 
     fn part_2(&self) -> Self::Result {
-        2
+        let input = include_str!("data/day19");
+        count_ratings_combinations(input)
     }
 }
 
@@ -136,6 +137,58 @@ fn do_instruction(part: &Part, instructions: &Instructions, label: &str) -> bool
     unreachable!("instructions should always return a value");
 }
 
+fn combinations_from_range(rating_ranges: &Vec<(usize, usize)>) -> usize {
+    rating_ranges
+        .iter()
+        .map(|(start, end)| end - start + 1)
+        .product()
+}
+
+fn ratings_combinations(
+    rating_ranges: Vec<(usize, usize)>,
+    instructions: &Instructions,
+    label: &str,
+) -> usize {
+    let mut rating_ranges = rating_ranges.clone();
+    let mut combinations = 0;
+
+    let process_retval = |retval: &RetVal, rating_ranges: Vec<(usize, usize)>| match retval {
+        RetVal::Accept => combinations_from_range(&rating_ranges),
+        RetVal::Reject => 0,
+        RetVal::Label(label) => ratings_combinations(rating_ranges, instructions, label),
+    };
+
+    for op in &instructions[label] {
+        if rating_ranges.iter().any(|(start, end)| start >= end) {
+            return 0;
+        }
+
+        match op {
+            Op::Lt(attr_index, value, retval) => {
+                let (start, end) = rating_ranges[*attr_index];
+                // process valid range
+                rating_ranges[*attr_index] = (start, end.min(value.saturating_sub(1)));
+                combinations += process_retval(retval, rating_ranges.clone());
+                // continue with invalid range
+                rating_ranges[*attr_index] = (start.max(*value), end);
+            }
+            Op::Gt(attr_index, value, retval) => {
+                let (start, end) = rating_ranges[*attr_index];
+                // process valid range
+                rating_ranges[*attr_index] = (start.max(value + 1), end);
+                combinations += process_retval(retval, rating_ranges.clone());
+                // continue with invalid range
+                rating_ranges[*attr_index] = (start, end.min(*value))
+            }
+            Op::Return(retval) => {
+                combinations += process_retval(retval, rating_ranges.clone());
+            }
+        }
+    }
+
+    combinations
+}
+
 fn accepted_parts_rating_sum(input: &str) -> usize {
     let (instructions, parts) = parse(input);
     parts
@@ -143,6 +196,12 @@ fn accepted_parts_rating_sum(input: &str) -> usize {
         .filter(|part| do_instruction(part, &instructions, "in"))
         .map(|part| part.iter().sum::<usize>())
         .sum()
+}
+
+fn count_ratings_combinations(input: &str) -> usize {
+    let (instructions, _parts) = parse(input);
+    let ranges = vec![(1, 4000), (1, 4000), (1, 4000), (1, 4000)];
+    ratings_combinations(ranges, &instructions, "in")
 }
 
 #[cfg(test)]
@@ -170,5 +229,10 @@ hdj{m>838:A,pv}
     #[test]
     fn part_1() {
         assert_eq!(accepted_parts_rating_sum(INPUT_1), 19114)
+    }
+
+    #[test]
+    fn part_2() {
+        assert_eq!(count_ratings_combinations(INPUT_1), 167409079868000);
     }
 }
