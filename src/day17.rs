@@ -10,11 +10,12 @@ impl Solution for Day17 {
 
     fn part_1(&self) -> Self::Result {
         let input = include_str!("data/day17");
-        find_best_path(input)
+        find_best_path(input, false)
     }
 
     fn part_2(&self) -> Self::Result {
-        2023 * 25
+        let input = include_str!("data/day17");
+        find_best_path(input, true)
     }
 }
 
@@ -78,7 +79,7 @@ fn end_position(grid: &Grid) -> Position {
     (grid.len() - 1, grid[0].len() - 1)
 }
 
-fn find_best_path(input: &str) -> usize {
+fn find_best_path(input: &str, use_slow_steering: bool) -> usize {
     use Direction::*;
 
     let grid = parse(input);
@@ -98,8 +99,14 @@ fn find_best_path(input: &str) -> usize {
 
         let (position, direction, consecutive_moves) = state;
 
-        if consecutive_moves > 3 {
-            continue;
+        if !use_slow_steering {
+            if consecutive_moves > 3 {
+                continue;
+            }
+        } else {
+            if consecutive_moves > 10 {
+                continue;
+            }
         }
 
         if position == end_position(&grid) {
@@ -115,6 +122,7 @@ fn find_best_path(input: &str) -> usize {
         visited_states.insert(state, heat_loss);
 
         for next_direction in [Up, Right, Left, Down] {
+            // Skip backwards directions
             match (direction, next_direction) {
                 (Up, Down) | (Right, Left) | (Left, Right) | (Down, Up) => continue,
                 _ => (),
@@ -123,6 +131,10 @@ fn find_best_path(input: &str) -> usize {
             let Some(next_position) = next_position(&grid, position, next_direction) else {
                 continue;
             };
+
+            if use_slow_steering && direction != next_direction && consecutive_moves < 4 {
+                continue;
+            }
 
             let consecutive_moves = if direction == next_direction {
                 consecutive_moves + 1
@@ -163,7 +175,11 @@ mod tests {
 
     #[test]
     fn part_1() {
-        assert_eq!(find_best_path(INPUT_1), 102);
-        // assert_eq!(Day17::new().part_1(), 2023);
+        assert_eq!(find_best_path(INPUT_1, false), 102);
+    }
+
+    #[test]
+    fn part_2() {
+        assert_eq!(find_best_path(INPUT_1, true), 94);
     }
 }
