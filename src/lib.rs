@@ -10,7 +10,7 @@ macro_rules! time {
     }};
 }
 
-seq!(N in 1..=2 {
+seq!(N in 1..=3 {
     #(mod day~N;)*
 
     pub fn solve(day: Option<u8>, part: Option<u8>) {
